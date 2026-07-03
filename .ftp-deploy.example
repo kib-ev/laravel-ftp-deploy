@@ -1,0 +1,8 @@
+# Local-only FTP deploy credentials (copy to .ftp-deploy in project root)
+host=ftp.example.com
+username=
+password=
+port=21
+root=/sites/example.com
+ssl=false
+passive=true

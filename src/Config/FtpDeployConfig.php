@@ -7,19 +7,11 @@ namespace FtpDeploy\Config;
 final class FtpDeployConfig
 {
     /**
-     * @param  array{
-     *     host: string,
-     *     username: string,
-     *     password: string,
-     *     port: int,
-     *     root: string,
-     *     ssl: bool,
-     *     passive: bool,
-     * }  $connection
+     * @param  list<string>  $allowedEnvironments
      */
     public function __construct(
-        public readonly string $envFile,
-        public readonly array $connection,
+        public readonly string $configFile,
+        public readonly array $allowedEnvironments,
     ) {
     }
 
@@ -28,35 +20,19 @@ final class FtpDeployConfig
      */
     public static function fromArray(array $config): self
     {
-        $root = self::normalizeRoot((string) ($config['root'] ?? '/'));
+        $allowed = $config['allowed_environments'] ?? ['local'];
+        if (! is_array($allowed)) {
+            $allowed = ['local'];
+        }
 
         return new self(
-            envFile: (string) ($config['env_file'] ?? '.env.local'),
-            connection: [
-                'host' => (string) ($config['host'] ?? ''),
-                'username' => (string) ($config['username'] ?? ''),
-                'password' => (string) ($config['password'] ?? ''),
-                'port' => (int) ($config['port'] ?? 21),
-                'root' => $root,
-                'ssl' => (bool) ($config['ssl'] ?? false),
-                'passive' => (bool) ($config['passive'] ?? true),
-            ],
+            configFile: (string) ($config['config_file'] ?? '.ftp-deploy'),
+            allowedEnvironments: array_values(array_map('strval', $allowed)),
         );
     }
 
-    public function hasConnectionInConfig(): bool
+    public function isEnvironmentAllowed(string $environment): bool
     {
-        $connection = $this->connection;
-
-        return $connection['host'] !== ''
-            && $connection['username'] !== ''
-            && $connection['password'] !== '';
-    }
-
-    private static function normalizeRoot(string $root): string
-    {
-        $root = '/'.trim(str_replace('\\', '/', $root), '/');
-
-        return $root === '/' ? '' : $root;
+        return in_array($environment, $this->allowedEnvironments, true);
     }
 }

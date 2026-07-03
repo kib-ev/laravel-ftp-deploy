@@ -1,6 +1,8 @@
 # kib-ev/laravel-ftp-deploy
 
-Artisan-команда `php artisan deploy` для выкладки файлов Laravel-проекта на shared-хостинг по FTP.
+Artisan-команда `php artisan deploy` для выкладки файлов на shared-хостинг по FTP.
+
+**Только для локальной разработки:** команда работает при `APP_ENV=local`, учётные данные хранятся в `.ftp-deploy` (не коммитится).
 
 Репозиторий: [github.com/kib-ev/laravel-ftp-deploy](https://github.com/kib-ev/laravel-ftp-deploy)
 
@@ -12,47 +14,43 @@ Artisan-команда `php artisan deploy` для выкладки файлов
 ## Установка
 
 ```bash
-composer require kib-ev/laravel-ftp-deploy
+composer require --dev kib-ev/laravel-ftp-deploy
 ```
 
-Опубликуйте конфиг (опционально):
-
-```bash
-php artisan vendor:publish --tag=ftp-deploy-config
-```
+На продакшене с `composer install --no-dev` пакет не устанавливается.
 
 ## Настройка
 
-По умолчанию учётные данные читаются из `.env.local` в корне проекта (отдельно от основного `.env`):
+Скопируйте пример в корень Laravel-проекта:
 
-```env
-DEPLOY_FTP_HOST=ftp.example.com
-DEPLOY_FTP_USERNAME=user
-DEPLOY_FTP_PASSWORD=secret
-DEPLOY_FTP_PORT=21
-DEPLOY_FTP_ROOT=/sites/example.com
-DEPLOY_FTP_SSL=false
-DEPLOY_FTP_PASSIVE=true
+```bash
+cp vendor/kib-ev/laravel-ftp-deploy/.ftp-deploy.example .ftp-deploy
 ```
 
-Либо задайте `DEPLOY_FTP_*` в основном `.env` — тогда `.env.local` не нужен.
+`.ftp-deploy`:
 
-Путь к файлу с credentials: `FTP_DEPLOY_ENV_FILE=.env.local` (в `config/ftp-deploy.php`).
+```ini
+host=ftp.example.com
+username=user
+password=secret
+port=21
+root=/sites/example.com
+ssl=false
+passive=true
+```
+
+Добавьте в `.gitignore` проекта:
+
+```
+.ftp-deploy
+```
 
 ## Использование
 
 ```bash
-# один файл
 php artisan deploy --file=public/index.php
-
-# локальное имя → удалённое (например .env.production → .env)
 php artisan deploy --file=.env.production:.env
-
-# все файлы в каталоге рекурсивно
 php artisan deploy --dir=app/Http/Controllers
-
-# несколько путей
-php artisan deploy --file=routes/web.php --dir=config
 ```
 
 ## Локальная разработка (path repository)
@@ -65,7 +63,7 @@ php artisan deploy --file=routes/web.php --dir=config
             "url": "../laravel-ftp-deploy"
         }
     ],
-    "require": {
+    "require-dev": {
         "kib-ev/laravel-ftp-deploy": "*"
     }
 }

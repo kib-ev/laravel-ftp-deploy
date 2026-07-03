@@ -5,25 +5,22 @@ declare(strict_types=1);
 return [
     /*
     |--------------------------------------------------------------------------
-    | Credentials file
+    | Config file
     |--------------------------------------------------------------------------
     |
-    | Path to an env file with FTP credentials, relative to the project root.
-    | Keeps deploy secrets separate from the main .env (e.g. .env.local).
+    | Path to a local credentials file in the project root (.ftp-deploy).
+    | Not committed to git — for dev machines only.
     |
     */
-    'env_file' => env('FTP_DEPLOY_ENV_FILE', '.env.local'),
+    'config_file' => '.ftp-deploy',
 
     /*
     |--------------------------------------------------------------------------
-    | FTP connection (optional — overrides env file when set in main .env)
+    | Allowed environments
     |--------------------------------------------------------------------------
+    |
+    | The deploy command refuses to run outside these APP_ENV values.
+    |
     */
-    'host' => env('DEPLOY_FTP_HOST'),
-    'username' => env('DEPLOY_FTP_USERNAME'),
-    'password' => env('DEPLOY_FTP_PASSWORD'),
-    'port' => (int) env('DEPLOY_FTP_PORT', 21),
-    'root' => env('DEPLOY_FTP_ROOT', '/'),
-    'ssl' => filter_var(env('DEPLOY_FTP_SSL', false), FILTER_VALIDATE_BOOLEAN),
-    'passive' => filter_var(env('DEPLOY_FTP_PASSIVE', true), FILTER_VALIDATE_BOOLEAN),
+    'allowed_environments' => ['local'],
 ];

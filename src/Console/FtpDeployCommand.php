@@ -6,7 +6,7 @@ namespace FtpDeploy\Console;
 
 use FtpDeploy\Config\FtpDeployConfig;
 use FtpDeploy\FtpDeployService;
-use FtpDeploy\Support\EnvFileConfigLoader;
+use FtpDeploy\Support\DeployConfigFileLoader;
 use Illuminate\Console\Command;
 use Throwable;
 
@@ -16,10 +16,17 @@ class FtpDeployCommand extends Command
                             {--file=* : File path relative to project root (repeatable; use local:remote to rename)}
                             {--dir=* : Directory path relative to project root (upload all files recursively)}';
 
-    protected $description = 'Upload files to remote hosting via FTP';
+    protected $description = 'Upload files to remote hosting via FTP (local dev only)';
 
     public function handle(FtpDeployConfig $config): int
     {
+        if (! $config->isEnvironmentAllowed(app()->environment())) {
+            $allowed = implode(', ', $config->allowedEnvironments);
+            $this->error("FTP deploy is only available when APP_ENV is: {$allowed}.");
+
+            return self::FAILURE;
+        }
+
         $files = $this->option('file');
         $dirs = $this->option('dir');
 
@@ -33,10 +40,7 @@ class FtpDeployCommand extends Command
         }
 
         try {
-            $connection = $config->hasConnectionInConfig()
-                ? $config->connection
-                : EnvFileConfigLoader::load(base_path(), $config->envFile);
-
+            $connection = DeployConfigFileLoader::load(base_path(), $config->configFile);
             $deployer = new FtpDeployService(base_path(), $connection);
 
             $this->info("Connecting to {$connection['host']}:{$connection['port']}…");

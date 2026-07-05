@@ -53,6 +53,18 @@ php artisan deploy --file=.env.production:.env
 php artisan deploy --dir=app/Http/Controllers
 ```
 
+## AI-assisted workflow (Cursor, etc.)
+
+This package works well with AI-powered editors such as [Cursor](https://cursor.com). After you change code locally, ask the agent to deploy only the modified files — no separate deployment pipeline required.
+
+Example prompts:
+
+- *"Deploy the changed files to production via FTP"*
+- *"Run `php artisan deploy` for `routes/web.php` and `app/Http/Controllers/OrderController.php`"*
+- *"Upload `.env.production` as `.env` on the server"*
+
+The agent can run `php artisan deploy --file=...` for individual paths or `--dir=...` for whole directories. Credentials stay in your local `.ftp-deploy` file and are never committed to git.
+
 ## Local development (path repository)
 
 ```json

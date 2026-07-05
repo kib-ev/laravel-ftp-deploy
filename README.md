@@ -1,27 +1,27 @@
 # kib-ev/laravel-ftp-deploy
 
-Artisan-команда `php artisan deploy` для выкладки файлов на shared-хостинг по FTP.
+Artisan command `php artisan deploy` for uploading project files to shared hosting via FTP.
 
-**Только для локальной разработки:** команда работает при `APP_ENV=local`, учётные данные хранятся в `.ftp-deploy` (не коммитится).
+**Local development only:** the command runs when `APP_ENV=local`. Credentials are stored in `.ftp-deploy` (not committed to git).
 
-Репозиторий: [github.com/kib-ev/laravel-ftp-deploy](https://github.com/kib-ev/laravel-ftp-deploy)
+Repository: [github.com/kib-ev/laravel-ftp-deploy](https://github.com/kib-ev/laravel-ftp-deploy)
 
-## Требования
+## Requirements
 
 - PHP 8.1+
 - ext-ftp
 
-## Установка
+## Installation
 
 ```bash
 composer require --dev kib-ev/laravel-ftp-deploy
 ```
 
-На продакшене с `composer install --no-dev` пакет не устанавливается.
+On production with `composer install --no-dev`, the package is not installed.
 
-## Настройка
+## Configuration
 
-Скопируйте пример в корень Laravel-проекта:
+Copy the example file to your Laravel project root:
 
 ```bash
 cp vendor/kib-ev/laravel-ftp-deploy/.ftp-deploy.example .ftp-deploy
@@ -39,13 +39,13 @@ ssl=false
 passive=true
 ```
 
-Добавьте в `.gitignore` проекта:
+Add to your project `.gitignore`:
 
 ```
 .ftp-deploy
 ```
 
-## Использование
+## Usage
 
 ```bash
 php artisan deploy --file=public/index.php
@@ -53,7 +53,7 @@ php artisan deploy --file=.env.production:.env
 php artisan deploy --dir=app/Http/Controllers
 ```
 
-## Локальная разработка (path repository)
+## Local development (path repository)
 
 ```json
 {
@@ -69,6 +69,6 @@ php artisan deploy --dir=app/Http/Controllers
 }
 ```
 
-## Лицензия
+## License
 
 MIT

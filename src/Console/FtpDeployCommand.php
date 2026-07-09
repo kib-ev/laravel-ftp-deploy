@@ -42,11 +42,7 @@ class FtpDeployCommand extends Command
         try {
             $connection = DeployConfigFileLoader::load(base_path(), $config->configFile);
             $deployer = new FtpDeployService(base_path(), $connection);
-
-            $this->info("Connecting to {$connection['host']}:{$connection['port']}…");
-            $deployer->connect();
-
-            $uploaded = 0;
+            $uploads = [];
 
             foreach ($files ?? [] as $file) {
                 if ($file === null || $file === '') {
@@ -56,11 +52,7 @@ class FtpDeployCommand extends Command
                 [$local, $remote] = str_contains($file, ':')
                     ? explode(':', $file, 2)
                     : [$file, $file];
-
-                $deployer->uploadAs($local, $remote);
-                $label = $local === $remote ? $local : "{$local} → {$remote}";
-                $this->line("  <info>✓</info> {$label}");
-                $uploaded++;
+                $uploads[] = [$local, $remote, $local === $remote ? $local : "{$local} → {$remote}"];
             }
 
             foreach ($dirs ?? [] as $dir) {
@@ -68,15 +60,33 @@ class FtpDeployCommand extends Command
                     continue;
                 }
                 foreach ($deployer->filesInDirectory($dir) as $file) {
-                    $deployer->upload($file);
-                    $this->line("  <info>✓</info> {$file}");
-                    $uploaded++;
+                    $uploads[] = [$file, $file, $file];
                 }
             }
 
+            if ($uploads === []) {
+                $this->error('Nothing to upload after resolving --file/--dir options.');
+
+                return self::FAILURE;
+            }
+
+            $this->info("Connecting to {$connection['host']}:{$connection['port']}…");
+            $deployer->connect();
+            $bar = $this->output->createProgressBar(count($uploads));
+            $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %message%');
+            $bar->setMessage('uploading…');
+            $bar->start();
+
+            foreach ($uploads as [$local, $remote, $label]) {
+                $bar->setMessage($label);
+                $deployer->uploadAs($local, $remote);
+                $bar->advance();
+            }
+
             $deployer->disconnect();
-            $this->newLine();
-            $this->info("Done: uploaded {$uploaded} file(s).");
+            $bar->finish();
+            $this->newLine(2);
+            $this->info('Done: uploaded '.count($uploads).' file(s).');
 
             return self::SUCCESS;
         } catch (Throwable $e) {

@@ -104,7 +104,7 @@ final class FtpDeployService
 
         $files = [];
         $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($localDir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
+            new RecursiveDirectoryIterator($localDir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
         );
 
         foreach ($iterator as $file) {
